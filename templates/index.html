@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cadastro de Itens</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      .form-container {
+        background: #f4f4f9;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+      }
+      .form-group {
+        margin-bottom: 1rem;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #0056b3;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+      }
+      th,
+      td {
+        padding: 0.75rem;
+        border-bottom: 1px solid #ddd;
+        text-align: left;
+      }
+      th {
+        background-color: #f4f4f9;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Gerenciamento de Itens</h1>
+
+    <!-- Formulário de Cadastro -->
+    <div class="form-container">
+      <h2>Novo Cadastro</h2>
+      <form id="cadastroForm">
+        <div class="form-group">
+          <label for="nome">Nome:</label>
+          <input type="text" id="nome" name="nome" required />
+        </div>
+
+        <div class="form-group">
+          <label for="telefone">Telefone:</label>
+          <input type="text" id="telefone" name="telefone" required />
+        </div>
+
+        <div class="form-group">
+          <label for="valor">Valor:</label>
+          <input type="number" id="valor" name="valor" step="0.01" required />
+        </div>
+
+        <button type="submit">Salvar Registro</button>
+      </form>
+    </div>
+
+    <!-- Lista de Dados renderizada pelo Jinja -->
+    <h2>Itens Cadastrados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>Valor</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in dados %}
+        <tr>
+          <td>{{ item.nome }}</td>
+          <td>{{ item.telefone }}</td>
+          <td>R$ {{ item.valor }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="3" style="text-align: center">
+            Nenhum item cadastrado ainda.
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <script>
+      // Intercepta o envio do formulário
+      document
+        .getElementById("cadastroForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault(); // Impede a página de recarregar imediatamente
+
+          // Monta o objeto JSON
+          const dados = {
+            nome: document.getElementById("nome").value,
+            telefone: document.getElementById("telefone").value,
+            valor: document.getElementById("valor").value,
+          };
+
+          // Envia para a sua rota de API
+          fetch("/api/registrar", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(dados),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.erro) {
+                alert("Erro: " + data.erro);
+              } else {
+                alert("Cadastrado com sucesso!");
+                window.location.reload(); // Recarrega a página para o Jinja atualizar a tabela
+              }
+            })
+            .catch((error) => {
+              console.error("Erro na requisição:", error);
+              alert("Erro ao tentar conectar com a API.");
+            });
+        });
+    </script>
+  </body>
+</html>
