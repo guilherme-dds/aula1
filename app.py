@@ -62,5 +62,5 @@ def registrar():
     }), 201
 
 if __name__ == '__main__':
-    # Roda a aplicação na porta padrão (5000)
-    app.run(debug=True)
+    # Roda a aplicação na porta padrão (5000) escutando em todas as interfaces de rede
+    app.run(host='0.0.0.0', port=5000, debug=True)
